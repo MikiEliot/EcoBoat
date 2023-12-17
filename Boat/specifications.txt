@@ -1,0 +1,14 @@
+
+poids de bateau sans boite : 1570 gr;
+
+longeur : 740 mm;
+
+largeur : 360 mm; 
+
+longeur planche : 405 mm;
+
+largeur planche : 280 mm; 
+
+chargé maximale : 1100 gr;
+
+vitesse maximale avec un moteur et le chargé maximale : 0.6 km/h (0.16 m/s) ; 
