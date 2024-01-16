@@ -1,0 +1,23 @@
+#Connections - echo - 8, trig - 7, gnd- gnd, Vcc - 5v
+
+long duree;
+float dist;
+
+void setup(){
+  pinMode(7,OUTPUT);
+  pinMode(8,INPUT);
+  Serial.begin(9600);
+}
+
+void loop(){
+  digitalWrite(7,LOW);
+  delay(1000);
+
+  digitalWrite(7,HIGH);
+  delayMicroseconds(10);
+  digitalWrite(7,LOW);
+
+  duree = pulseIn(8,HIGH);
+  dist = (duree * 0.034) / 2;
+  Serial.println(dist);
+}
