@@ -1,0 +1,24 @@
+# Connections : gnd - gnd, Vcc - 5v, TdX - 11, RdX - 10, En (for parameters), state (check the state of conection)
+
+
+#include <SoftwareSerial.h>
+
+SoftwareSerial BluetoothSerial(11,10);
+
+void setup(){
+  pinMode(11, INPUT);
+  pinMode(10, OUTPUT);
+  Serial.begin(9600);
+  BluetoothSerial.begin(9600);
+
+}
+
+void loop(){
+  char var = 'z';
+  if(BluetoothSerial.available()){
+    var = (char) BluetoothSerial.read();
+    if(var=='a'){
+      Serial.println(var);
+    }
+  }
+}
