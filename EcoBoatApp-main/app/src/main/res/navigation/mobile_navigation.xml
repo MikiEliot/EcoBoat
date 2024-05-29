@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_home">
+
+    <fragment
+        android:id="@+id/nav_home"
+        android:name="fr.vannes.ecoboat.ui.home.HomeFragment"
+        android:label="@string/menu_home"
+        tools:layout="@layout/fragment_home" />
+
+    <fragment
+        android:id="@+id/nav_nitrate"
+        android:name="fr.vannes.ecoboat.ui.nitrate.NitrateFragment"
+        android:label="@string/menu_nitrate"
+        tools:layout="@layout/fragment_nitrate" />
+    <fragment
+        android:id="@+id/nav_temperature"
+        android:name="fr.vannes.ecoboat.ui.temperature.TemperatureFragment"
+        android:label="@string/menu_temperature"
+        tools:layout="@layout/fragment_temperature" />
+    <fragment
+        android:id="@+id/nav_ph"
+        android:name="fr.vannes.ecoboat.ui.ph.PhFragment"
+        android:label="@string/menu_ph"
+        tools:layout="@layout/fragment_ph" />
+</navigation>

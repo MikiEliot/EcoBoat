@@ -12,7 +12,7 @@ int servoPin = 13;
 Servo Servo1; 
 Ultrasonic ultrasonic(9, 8); // Trig et Echo
 
-BTHC05 bthc05(10, 11); // RXD to pin 10, TXD to pin 11 (adjust pins based on your connections)
+BTHC05 bthc05(10, 11); // TXD to pin 10, RXD to pin 11 (adjust pins based on your connections)
 int motor1Pin1 = 2; // pin 2 on L293D IC
 int motor1Pin2 = 3; // pin 7 on L293D IC
 int enable1Pin = 5; // pin 1 on L293D IC
@@ -24,7 +24,7 @@ int flag=0;        //makes sure that the serial only prints once the state
 int stateStop=0;
 bool moveServoFlag = true;
 void setup() {
-    Servo1.attach(servoPin);
+    // Servo1.attach(servoPin);
     // sets the pins as outputs:
     pinMode(motor1Pin1, OUTPUT);
     pinMode(motor1Pin2, OUTPUT);
@@ -43,9 +43,9 @@ void setup() {
 }
 // ----------------------------------------- Modified code with bluetooth -------------------------------------------------
 void loop() {
-    int dist = ultrasonic.Ranging(CM);
-    Serial.print(dist);
-    Serial.println(" cm");
+    // int dist = ultrasonic.Ranging(CM);
+    // Serial.print(dist);
+    // Serial.println(" cm");
 
     delay(500);
     if (bthc05.available()) {
@@ -75,8 +75,8 @@ void loop() {
     }
     // Pour utilisé le capter de la distance, il faut decommenter cette partie du code
     // else {
-    //     // moveServo();
-    //     if (dist < 300) {
+    //     moveServo();
+    //     if (dist < 100) {
     //         stopMotors();
     //     } else {
     //         moveForward();
@@ -89,8 +89,8 @@ void loop() {
 void moveServo() {
   static unsigned long prevMillis = 0;
   static int step = 0;
-  const int totalSteps = 40;
-  const int duration = 10; // 20 seconds
+  const int totalSteps = 3;
+  const int duration = 2; // 20 seconds
 
   unsigned long currentMillis = millis();
 

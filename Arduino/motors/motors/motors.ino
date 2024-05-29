@@ -1,4 +1,12 @@
 #include "BTHC05.h"
+#include "Ultrasonic.h"
+
+
+
+
+
+
+Ultrasonic ultrasonic(9, 8); // Trig et Echo
 
 BTHC05 bthc05(10, 11); // RXD to pin 10, TXD to pin 11 (adjust pins based on your connections)
 int motor1Pin1 = 2; // pin 2 on L293D IC
@@ -23,85 +31,19 @@ void setup() {
     digitalWrite(enable2Pin, HIGH);
     // initialize serial communication at 9600 bits per second:
     Serial.begin(9600);
+
     bthc05.begin(9600);
 
     Serial.println("Bluetooth On....");
 }
 
-// void loop() {
-//     //if some date is sent, reads it and saves in state
-//     if(Serial.available() > 0){     
-//       state = Serial.read();   
-//       flag=0;
-//     }   
-//     // if the state is 'F' the DC motor will go forward
-//     if (state == 'F') {
-//         digitalWrite(motor1Pin1, HIGH);
-//         digitalWrite(motor1Pin2, LOW); 
-//         digitalWrite(motor2Pin1, LOW);
-//         digitalWrite(motor2Pin2, HIGH);
-//         if(flag == 0){
-//           Serial.println("Go Forward!");
-//           flag=1;
-//         }
-//     }
-    
-//     // if the state is 'R' the motor will turn left
-//     else if (state == 'R') {
-//         digitalWrite(motor1Pin1, HIGH); 
-//         digitalWrite(motor1Pin2, LOW); 
-//         digitalWrite(motor2Pin1, LOW);
-//         digitalWrite(motor2Pin2, LOW);
-//         if(flag == 0){
-//           Serial.println("Turn LEFT");
-//           flag=1;
-//         }
-//         delay(1500);
-//         state=3;
-//         stateStop=1;
-//     }
-//     // if the state is 'S' the motor will Stop
-//     else if (state == 'S' || stateStop == 1) {
-//         digitalWrite(motor1Pin1, LOW); 
-//         digitalWrite(motor1Pin2, LOW); 
-//         digitalWrite(motor2Pin1, LOW);
-//         digitalWrite(motor2Pin2, LOW);
-//         if(flag == 0){
-//           Serial.println("STOP!");
-//           flag=1;
-//         }
-//         stateStop=0;
-//     }
-//     // if the state is 'L' the motor will turn right
-//     else if (state == 'L') {
-//         digitalWrite(motor1Pin1, LOW); 
-//         digitalWrite(motor1Pin2, LOW); 
-//         digitalWrite(motor2Pin1, LOW);
-//         digitalWrite(motor2Pin2, HIGH);
-//         if(flag == 0){
-//           Serial.println("Turn RIGHT");
-//           flag=1;
-//         }
-//         delay(1500);
-//         state=3;
-//         stateStop=1;
-//     }
-//     // if the state is 'B' the motor will Reverse
-//     else if (state == 'B') {
-//         digitalWrite(motor1Pin1, LOW); 
-//         digitalWrite(motor1Pin2, HIGH);
-//         digitalWrite(motor2Pin1, HIGH);
-//         digitalWrite(motor2Pin2, LOW);
-//         if(flag == 0){
-//           Serial.println("Reverse!");
-//           flag=1;
-//         }
-//     }
-    //For debugging purpose
-    // Serial.println(state);
-
 // ----------------------------------------- Modified code with bluetooth -------------------------------------------------
 void loop() {
+    // int dist = ultrasonic.Ranging(CM);
+    // Serial.print(dist);
+    // Serial.println(" cm");
+
+    // delay(500);
     if (bthc05.available()) {
         char command = bthc05.read();
 
@@ -127,6 +69,16 @@ void loop() {
                 break;
         }
     }
+    // else if (!bthc05.available()) {
+    //     if (dist < 100) {
+    //         stopMotors();
+    //     } else {
+    //         moveForward();
+    //     }
+    // }
+    // else {
+    //   moveForward();
+    // }
 }
 
 void moveForward() {
@@ -142,9 +94,9 @@ void turnLeft() {
     digitalWrite(motor1Pin2, LOW);
     digitalWrite(motor2Pin1, LOW);
     digitalWrite(motor2Pin2, LOW);
-    Serial.println("Turn LEFT");
-    delay(1500);
-    stopMotors();
+    // Serial.println("Turn LEFT");
+    // delay(1500);
+    // stopMotors();
 }
 
 void stopMotors() {
@@ -161,8 +113,8 @@ void turnRight() {
     digitalWrite(motor2Pin1, LOW);
     digitalWrite(motor2Pin2, HIGH);
     Serial.println("Turn RIGHT");
-    delay(1500);
-    stopMotors();
+    // delay(1500);
+    // stopMotors();
 }
 
 void reverse() {

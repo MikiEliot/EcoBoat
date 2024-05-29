@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">EcoBoat</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">EcoBoat</string>
+    <string name="nav_header_subtitle">Préservons la nature</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="nitrate_text">Dernier taux de nitrate relevé : %s mg/L</string>
+    <string name="temperature_text">Dernière température relevée : %s °c</string>
+    <string name="ph_text">Dernier pH relevé : %s</string>
+
+    <string name="menu_home">Home</string>
+    <string name="menu_nitrate">Taux de nitrate</string>
+    <string name="menu_temperature">Température</string>
+    <string name="menu_ph">pH</string>
+    <string name="update">Mettre à jour</string>
+    <string name="eau_mauvaise">Qualité de l\'eau : Mauvaise</string>
+    <string name="eau_moyenne">Qualité de l\'eau : Moyenne</string>
+    <string name="eau_bonne">Qualité de l\'eau : Bonne</string>
+    <string name="tres_bonne">Qualité de l\'eau : Très bonne</string>
+    <string name="eau_excellente">Qualité de l\'eau : Excellente</string>
+    <string name="location_permission_denied">Permission de localisation refusée</string>
+
+
+</resources>

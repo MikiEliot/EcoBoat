@@ -9,42 +9,42 @@
 
 
 
-#define lightDetectorPin A0     // Light detector pin
+// #define lightDetectorPin A0     // Light detector pin
 #define temperatureSensorPin 2   // DS18B20 temperature sensor pin
 #define phMeterPin A1    
        // PH meter pin
 
 #define SD_CS_PIN 4           // SD card chip select pin
 #define lightPin 2              // Light detector pin
-
-SoftwareSerial gsm(7, 8);
-String urlTemperature = "http://julien.lamy.mobi:4000/api/capteurs/capteur_temperature";  // Initialiser un variable avec l'url du capteur sur l'api
-String urlAcidite = "http://julien.lamy.mobi:4000/api/capteurs/capteur_acidite";                                                                 // Définir les broches RX et TX du module GSM
+SoftwareSerial gsm(7, 8);                                                                // Définir les broches RX et TX du module GSM
 File dataFile;    
 String reponse;             // File object for data logging
 RTC_DS3231 rtc; // Create an instance of the RTC object
 OneWire oneWire(temperatureSensorPin); // Setup a oneWire instance to communicate with any OneWire devices
 DallasTemperature sensors(&oneWire);   // Pass the oneWire reference to Dallas Temperature sensor 
-
 void setup() {
-  pinMode(lightDetectorPin, INPUT); // Set light detector pin as input
+  
+  // pinMode(lightDetectorPin, INPUT); // Set light detector pin as input
   Serial.begin(115200);
-  gsm.begin(115200);     // Initialiser le port série du module GSM
-  Wire.begin();                     // Initialize I2C communication for the magnetometer
+  delay(1000); // Wait for serial communication to initialize
+  gsm.begin(115200);   
   sensors.begin();                  // Start DS18B20 temperature sensor
 }
 
 void loop() {
+  delay(3000);
+
+  // // getGPS();
+  // return;
+  // delay(10000);
   // Light sensor
-  int lightValue = analogRead(lightDetectorPin); // Read light sensor value
-  Serial.print("Light Sensor: ");                // Print light sensor value
-  Serial.println(lightValue);
-
-
-
+  // int lightValue = analogRead(lightDetectorPin); // Read light sensor value
+  // Serial.print("Light Sensor: ");                // Print light sensor value
+  // Serial.println(lightValue);
   // Temperature sensor (DS18B20)
   sensors.requestTemperatures();     // Request temperature from DS18B20 sensor
-  float temperature = sensors.getTempCByIndex(0); // Read temperature in Celsius
+  float temperature_raw = sensors.getTempCByIndex(0); // Read temperature in Celsius
+  float temperature = round(temperature_raw * 100.0) / 100.0; // Limit to two decimal places
   Serial.print("Temperature: ");     // Print temperature
   Serial.print(temperature);
   Serial.println(" °C");
@@ -79,12 +79,19 @@ void loop() {
 
   String jsonDataTemperature = "{\"temperature\":" + String(temperature) + "}";  // Construire la chaîne JSON avec la température
   String jsonDataAcidite = "{\"pH\":" + String(phValue) + "}"; 
-  getGPS();  // Une fois l'envoi terminé, appeler getGPS()
 
-  sendDatas(jsonDataTemperature, urlTemperature); 
-   // J'appelle la méthode sendDatas pour la température
+  // String urlTemperatureStr = String(urlTemperature);
+  // String urlAciditeStr = String(urlAcidite);
+  Serial.print("Le Url:  ");
+  sendDataTemp(jsonDataTemperature); 
 
-  delay(3000);  // Attendre 1 minute avant la prochaine requête   
+  delay(5000);  
+
+  sendDataPh(jsonDataAcidite);
+
+
+  delay(30000);  
+
 
 
 }
@@ -136,8 +143,13 @@ void readFile(const char* filename) {
 }
 
 void getGPS() {
+  // gsm.println("AT+CGNSSMODE=15,1");
+  // delay(3000);
+  // gsm.println("AT+CGPSNMEA=200191");
+  // delay(3000);
 
-  gsm.println("AT+CGPS=1");  // Je démarre le GPS
+  gsm.println("AT+CGPS=1"); 
+ // Je démarre le GPS
   delay(2000);
 
   gsm.println("AT+CGPSINFO");  // Je demande les infos
@@ -145,49 +157,137 @@ void getGPS() {
 
   while (gsm.available()) {
     char c = gsm.read();
+    Serial.print(c);
     reponse += c;
   }
+  //   // Find and extract latitude and longitude from GPS information
+  // int latIndex = reponse.indexOf(","); // Find index of first comma
+  // int longIndex = reponse.indexOf(",", latIndex + 1); // Find index of second comma
 
+  // String latitude = reponse.substring(latIndex + 1, longIndex); // Extract latitude
+  // String longitude = reponse.substring(longIndex + 1); // Extract longitude
+  // delay(1000);
+  // // Print latitude and longitude
+  // Serial.print("Latitude: ");
+  // Serial.println(latitude);
+  // delay(1000);
+
+  // Serial.print("Longitude: ");
+  // Serial.println(longitude);
+
+  // String gpsInfo = reponse.substring(reponse.length() - 17);  // Je récupère les derniers caractères
+  // Serial.print("Informations de localisation:");
   Serial.println(reponse);
-
-  String gpsInfo = reponse.substring(reponse.length() - 17);  // Je récupère les derniers caractères
-  Serial.print("Informations de localisation:");
-  Serial.println(gpsInfo);
   gsm.println("AT+CGPS=0");  // Je shut down le GPS
 }
+bool isGSMConnected() {
+  Serial.println("Checking GSM connection...");
+  gsm.println("AT"); // Send AT command to GSM module
+  delay(1000); // Wait for response
 
-void sendDatas(String jsonData, String url) {
+  String response = ""; // Initialize an empty string to store the response
 
-  // Stop la requète HTTP en cours si il y en a une
+  while (gsm.available()) {
+    char c = gsm.read(); // Read character from GSM module
+    response += c; // Append character to the response string
+    Serial.print(c); // Print the received character
+    
+    // Check if the response contains "OK"
+    if (response.indexOf("OK") != -1) {
+      Serial.println(" - OK received!"); // Debug statement
+      return true; // GSM module is connected
+    }
+  }
+
+  Serial.println(" - No OK received!"); // Debug statement
+  return false; // GSM module is not connected
+}
+
+
+
+void sendDataTemp(String jsonData) {
+
+
+  Serial.println("Sending HTTP request...");
+
   gsm.println("AT+HTTPTERM");
   delay(5000);
 
-  // Initialise la requète HTTP
   gsm.println("AT+HTTPINIT");
   delay(5000);
-  Serial.println("HTTP initialisé ...");
-
-  gsm.print("AT+HTTPPARA=\"URL\",\"");  // On ajoute l'url dans le header
-  gsm.print(url);
+  Serial.println("HTTP initialized ...");
+  gsm.print("AT+HTTPPARA=\"URL\",\"");
+  gsm.print("http://julien.lamy.mobi:4000/api/capteurs/capteur_temperature");
   gsm.println("\"");
   delay(5000);
+  
+  
 
-  gsm.println("AT+HTTPPARA=\"CONTENT\",\"application/json\"");  // On spécifie le contenu
+  gsm.println("AT+HTTPPARA=\"CONTENT\",\"application/json\"");
   delay(5000);
 
-  gsm.print("AT+HTTPDATA=");     // J'utilise la commande AT+HTTPDATA pour passer les données des capteurs
-  gsm.print(jsonData.length());  // Je dois lui donner la taille des données en bytes
+  Serial.print("Data length sent: ");
+  Serial.println(jsonData.length());
+  gsm.print("AT+HTTPDATA=");
+  gsm.print(jsonData.length());
   gsm.println(",5000");
   delay(5000);
-
-  gsm.println(jsonData);  // Je passe les données
+ 
+  Serial.print("Data sent: ");
+  Serial.println(jsonData);
+  gsm.println(jsonData);
   delay(5000);
 
-  gsm.println("AT+HTTPACTION=1");  // Appel de la méthode POST
+  gsm.println("AT+HTTPACTION=1");
   delay(5000);
 
-  Serial.println("Requête HTTP envoyée.");
+  Serial.println("HTTP request sent.");
 
-  gsm.println("AT+HTTPTERM");  // Fin de la requète
+  gsm.println("AT+HTTPTERM");
   delay(5000);
 }
+void sendDataPh(String jsonData) {
+
+
+  Serial.println("Sending HTTP request...");
+
+  gsm.println("AT+HTTPTERM");
+  delay(5000);
+
+  gsm.println("AT+HTTPINIT");
+  delay(5000);
+  Serial.println("HTTP initialized ...");
+  gsm.print("AT+HTTPPARA=\"URL\",\"");
+  gsm.print("http://julien.lamy.mobi:4000/api/capteurs/capteur_acidite");
+  gsm.println("\"");
+  delay(5000);
+  
+  
+
+  gsm.println("AT+HTTPPARA=\"CONTENT\",\"application/json\"");
+  delay(5000);
+
+  Serial.print("Data length sent: ");
+  Serial.println(jsonData.length());
+  gsm.print("AT+HTTPDATA=");
+  gsm.print(jsonData.length());
+  gsm.println(",5000");
+  delay(5000);
+ 
+  Serial.print("Data sent: ");
+  Serial.println(jsonData);
+  gsm.println(jsonData);
+  delay(5000);
+  Serial.print("Data sent: ");
+  Serial.println(jsonData);
+
+  gsm.println("AT+HTTPACTION=1");
+  delay(5000);
+
+  Serial.println("HTTP request sent.");
+
+  gsm.println("AT+HTTPTERM");
+  delay(5000);
+}
+
+

@@ -28,6 +28,7 @@ Assurez-vous de connecter les composants correctement selon le schéma ci-dessus
 Le module L293D fonctionne généralement avec une tension de travail de 4,5 à 36 V. Assurez-vous d'alimenter le module avec une tension appropriée, en tenant compte des spécifications de vos moteurs.
 
 ## Télécommande Bluetooth
+![Bluetooth](appli.png)
 
 L'application Bluetooth sur votre téléphone peut être utilisée pour envoyer des commandes au module HC-05, qui à son tour transmet ces commandes à l'Arduino. Les commandes typiques incluent :
 
